@@ -2,8 +2,7 @@
 
 [ext_resource type="Script" uid="uid://sithc7f8hnst" path="res://addons/MConsole/DropinScene/GameConsole.cs" id="1_fd6dq"]
 
-[node name="GameConsole" type="Control" node_paths=PackedStringArray("outputArea", "inputArea")]
-layout_mode = 3
+[node name="GameConsole" type="GridContainer" node_paths=PackedStringArray("outputArea", "inputArea", "autocomplete")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -15,13 +14,12 @@ mouse_filter = 2
 script = ExtResource("1_fd6dq")
 outputArea = NodePath("PanelContainer/GridContainer/MarginContainer/RichTextLabel")
 inputArea = NodePath("PanelContainer/GridContainer/MarginContainer2/LineEdit")
+autocomplete = NodePath("GridContainer")
 maxLineCount = 11
 
 [node name="PanelContainer" type="PanelContainer" parent="."]
-layout_mode = 1
-anchors_preset = 10
-anchor_right = 1.0
-grow_horizontal = 2
+layout_mode = 2
+size_flags_horizontal = 3
 
 [node name="GridContainer" type="GridContainer" parent="PanelContainer"]
 layout_mode = 2
@@ -50,3 +48,6 @@ theme_override_constants/margin_bottom = 4
 [node name="LineEdit" type="LineEdit" parent="PanelContainer/GridContainer/MarginContainer2"]
 layout_mode = 2
 size_flags_horizontal = 3
+
+[node name="GridContainer" type="GridContainer" parent="."]
+layout_mode = 2

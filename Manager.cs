@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace ConsoleCommands;
+namespace MConsole;
 /// <summary>
 /// Main class of the consolesystem. Make an instance of this where you think it fits into the project.
 /// Lets say ytou have a godclass static like Core. Then make an instance under it and expose it through a property like
@@ -142,6 +142,8 @@ public class Manager
         if (commands.ContainsKey(e))
         {
             GameConsole.SetTip(commands[e].Tip);
+        }else{
+            GameConsole.ClearTip();
         }
     }
 }// EOF CLASS

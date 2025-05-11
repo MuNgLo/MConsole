@@ -1,6 +1,6 @@
 using System;
 
-namespace ConsoleCommands;
+namespace MConsole;
 
 public class Command
 {

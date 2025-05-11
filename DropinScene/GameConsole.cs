@@ -1,5 +1,6 @@
 using Godot;
 using System;
+namespace MConsole;
 /// <summary>
 /// This is the class that controls the visual UI elements for the console
 /// Make sure you ONLY have one of these in the scene and that the console UI is on top.
@@ -13,6 +14,7 @@ public partial class GameConsole : Control
     public static EventHandler<string> OnConsoleInputSubmitted;
     [Export] private RichTextLabel outputArea;
     [Export] private LineEdit inputArea;
+    [Export] private GridContainer autocomplete;
     [Export] private int maxLineCount = 10;
     /// <summary>
     /// Returns true if console is visible and input area has focus. Use this to limit input while console is open.
@@ -21,6 +23,8 @@ public partial class GameConsole : Control
     public override void _EnterTree()
     {
         instance = this;
+        VisibilityChanged += () => { if(Visible){inputArea.GrabFocus();} };
+        inputArea.EditingToggled += (b) => {if(!b){Toggle();}};
         inputArea.TextSubmitted += WhenInputSubmitted;
         inputArea.TextChanged += WhenInputChanged;
         inputArea.TextChangeRejected += WhenInputRejected;
@@ -54,9 +58,10 @@ public partial class GameConsole : Control
         instance.inputArea.Clear();
         instance.inputArea.GrabFocus();
     }
-    public static void AddLine(string e){ instance.OutputAddLine(e);}
-    public static void AddLines(string[] e){ instance.OutputAddLines(e);}
-    private void OutputAddLine(string e){
+    public static void AddLine(string e) { instance.OutputAddLine(e); }
+    public static void AddLines(string[] e) { instance.OutputAddLines(e); }
+    private void OutputAddLine(string e)
+    {
         OutputAddLines([e]);
     }
     private void OutputAddLines(string[] e)
@@ -95,7 +100,8 @@ public partial class GameConsole : Control
         instance.Show();
         instance.inputArea.Clear();
         // If mouse cursor is visislbe grab focus to the input area
-        if(Input.MouseMode == Input.MouseModeEnum.Visible){
+        if (Input.MouseMode == Input.MouseModeEnum.Visible)
+        {
             instance.inputArea.GrabFocus();
         }
         return true;
@@ -103,6 +109,29 @@ public partial class GameConsole : Control
 
     internal static void SetTip(string tip)
     {
+        GD.Print($"GameConsole::SetTip({tip})");
+        RichTextLabel rtl;
+        if (instance.autocomplete.GetChildCount() < 1)
+        {
+            rtl = new RichTextLabel();
+            instance.autocomplete.AddChild(rtl, true);
+            rtl.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+            rtl.CustomMinimumSize = new Vector2(0, 20);
+            rtl.BbcodeEnabled = true;
+        }
+        else
+        {
+            rtl = instance.autocomplete.GetChild(0) as RichTextLabel;
+        }
+        rtl.Text = tip;
+    }
+
+    internal static void ClearTip()
+    {
+        for (int i = 0; i < instance.autocomplete.GetChildCount(); i++)
+        {
+            instance.autocomplete.GetChild(i).QueueFree();
+        }
     }
 
     internal static void SetInputText(string v)
@@ -114,4 +143,5 @@ public partial class GameConsole : Control
     {
         instance.inputArea.Text = string.Empty;
     }
+
 }// EOF CLASS
