@@ -10,13 +10,16 @@ public class Command
     /// <param name="sourceNote"></param>
     /// <param name="argumentCount">0 for no arguments, -1 for unlimited</param>
     public Command(string sourceNote, int argumentCount=0){
-        Source = sourceNote;
+        source = sourceNote;
         argCount = argumentCount;
     }
+
+    private string source;
     /// <summary>
-    /// Dev note to know where the command was registered from
+    /// Dev note to know where the command was registered from pass in with constructor.
+    /// Suggest using class name
     /// </summary>
-    internal string Source;
+    internal string Source => source;
     /// <summary>
     /// Name of the command and also the command
     /// </summary>

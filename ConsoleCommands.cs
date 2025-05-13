@@ -1,24 +1,27 @@
 using System;
 using System.Collections.Generic;
+using Godot;
 
 namespace MConsole;
 /// <summary>
 /// Main class of the consolesystem. Make an instance of this where you think it fits into the project.
-/// Lets say ytou have a godclass static like Core. Then make an instance under it and expose it through a property like
-/// Core.Commands
-/// Then use "Core.Commands.RegisterCommand" to register in your commands
-/// 
-/// Use cmd_ as prefix for built in commands
+/// Then make an instance under it and expose it through a property like
+/// Then use "ConsoleCommands.RegisterCommand" to register in your commands from _Ready or later
+/// allowing this to have been setup first
 /// </summary>
-public class Manager
+[GlobalClass]
+public partial class ConsoleCommands : Node
 {
+    private static ConsoleCommands ins;
     private Dictionary<string, Command> commands;
     private int historyLength = 20;
     private int historyIndex = 0;
     private List<string> history;
 
-    public Manager()
+    public override void _EnterTree()
     {
+        if(ins is not null){GD.PrintErr($"ConsoleCommands Singleton pattern cant be done. Instance already assigned. Do you have 2 ConsoleCommands Nodes?"); return;}
+        ins = this;
         commands = new Dictionary<string, Command>();
         history = new List<string>();
         GameConsole.OnConsoleInputChanged += WhenConsoleInputChange;
@@ -99,15 +102,15 @@ public class Manager
     /// </summary>
     /// <param name="cmd"></param>
     /// <returns></returns>
-    public bool RegisterCommand(Command cmd)
+    public static bool RegisterCommand(Command cmd)
     {
-        if (commands.ContainsKey(cmd.Name))
+        if (ins.commands.ContainsKey(cmd.Name))
         {
             GameConsole.AddLine($"Registering command \"{cmd.Name}\" failed. It already registered!");
             return false;
         }
-        commands[cmd.Name] = cmd;
-        return commands.ContainsKey(cmd.Name);
+        ins.commands[cmd.Name] = cmd;
+        return ins.commands.ContainsKey(cmd.Name);
     }
     /// <summary>
     /// Walk history pointer and set input area of console to that stored command
