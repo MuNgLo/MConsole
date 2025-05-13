@@ -25,9 +25,15 @@ public class Command
     /// </summary>
     internal string Name;
     /// <summary>
-    /// Description of command when given no parameters
+    /// Description of command 
     /// </summary>
     internal string Tip;
+    /// <summary>
+    /// Text returned when command failed
+    /// </summary>
+    internal string Help { get => help.Length == 0 ? Tip : help; set => help = value; }
+    internal string help;
+    
     /// <summary>
     /// Defines the Types the parameters needs to be for the command
     /// </summary>

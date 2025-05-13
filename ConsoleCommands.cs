@@ -13,6 +13,7 @@ namespace MConsole;
 public partial class ConsoleCommands : Node
 {
     private static ConsoleCommands ins;
+    public static EventHandler<OnCommandRecievedArguments> OnCommandRecieved;
     private Dictionary<string, Command> commands;
     private int historyLength = 20;
     private int historyIndex = 0;
@@ -20,7 +21,7 @@ public partial class ConsoleCommands : Node
 
     public override void _EnterTree()
     {
-        if(ins is not null){GD.PrintErr($"ConsoleCommands Singleton pattern cant be done. Instance already assigned. Do you have 2 ConsoleCommands Nodes?"); return;}
+        if (ins is not null) { GD.PrintErr($"ConsoleCommands Singleton pattern cant be done. Instance already assigned. Do you have 2 ConsoleCommands Nodes?"); return; }
         ins = this;
         commands = new Dictionary<string, Command>();
         history = new List<string>();
@@ -76,7 +77,7 @@ public partial class ConsoleCommands : Node
                 // Check if the command was given withouth any params when it should. If so give tip
                 if (cmd.ArgCount > 0)
                 {
-                    GameConsole.AddLine(commands[args[0]].Tip);
+                    GameConsole.AddLine(commands[args[0]].Help);
                     return;
 
                 }
@@ -84,13 +85,16 @@ public partial class ConsoleCommands : Node
                 {
                     // Run the command and push return string to console
                     GameConsole.AddLine(cmd.act.Invoke(args));
+                    OnCommandRecieved?.Invoke(this, new OnCommandRecievedArguments(args[0], args));
                     return;
                 }
 
-            }else if (args.Length == cmd.ArgCount + 1)
+            }
+            else if (args.Length == cmd.ArgCount + 1)
             {
                 // Run the command and push return string to console
                 GameConsole.AddLine(cmd.act.Invoke(args));
+                OnCommandRecieved?.Invoke(this, new OnCommandRecievedArguments(args[0], args));
                 return;
 
             }
@@ -115,25 +119,25 @@ public partial class ConsoleCommands : Node
     /// <summary>
     /// Walk history pointer and set input area of console to that stored command
     /// </summary>
-    public void HistoryUp()
+    public static void HistoryUp()
     {
-        if (history.Count < 1) { return; }
-        historyIndex = Math.Clamp(historyIndex - 1, 0, Math.Min(history.Count - 1, historyLength));
-        GameConsole.SetInputText(history[historyIndex]);
+        if (ins.history.Count < 1) { return; }
+        ins.historyIndex = Math.Clamp(ins.historyIndex - 1, 0, Math.Min(ins.history.Count - 1, ins.historyLength));
+        GameConsole.SetInputText(ins.history[ins.historyIndex]);
     }
     /// <summary>
     /// Walk history pointer and set input area of console to that stored command
     /// </summary>
-    public void HistoryDown()
+    public static void HistoryDown()
     {
-        if (history.Count < 1) { return; }
-        if (history.Count - 1 == historyIndex)
+        if (ins.history.Count < 1) { return; }
+        if (ins.history.Count - 1 == ins.historyIndex)
         {
-            historyIndex = history.Count; GameConsole.ClearInput();
+            ins.historyIndex = ins.history.Count; GameConsole.ClearInput();
             return;
         }
-        historyIndex = Math.Clamp(historyIndex + 1, 0, Math.Min(history.Count - 1, historyLength));
-        GameConsole.SetInputText(history[historyIndex]);
+        ins.historyIndex = Math.Clamp(ins.historyIndex + 1, 0, Math.Min(ins.history.Count - 1, ins.historyLength));
+        GameConsole.SetInputText(ins.history[ins.historyIndex]);
     }
     /// <summary>
     /// TODO use this for autocompletion!
@@ -145,7 +149,9 @@ public partial class ConsoleCommands : Node
         if (commands.ContainsKey(e))
         {
             GameConsole.SetTip(commands[e].Tip);
-        }else{
+        }
+        else
+        {
             GameConsole.ClearTip();
         }
     }

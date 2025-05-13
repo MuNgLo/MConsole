@@ -23,8 +23,8 @@ public partial class GameConsole : Control
     public override void _EnterTree()
     {
         instance = this;
-        VisibilityChanged += () => { if(Visible){inputArea.GrabFocus();} };
-        inputArea.EditingToggled += (b) => {if(!b){Toggle();}};
+        VisibilityChanged += () => { if (Visible) { inputArea.GrabFocus(); } };
+        inputArea.EditingToggled += (b) => { if (!b) { Toggle(); } };
         inputArea.TextSubmitted += WhenInputSubmitted;
         inputArea.TextChanged += WhenInputChanged;
         inputArea.TextChangeRejected += WhenInputRejected;
@@ -32,10 +32,24 @@ public partial class GameConsole : Control
         outputArea.Text = "Console - Welcome to the Despair of the wicked and forgotten. Stay a while. Stay Forever.";
         outputArea.Text += System.Environment.NewLine;
         Hide();
+        instance.ProcessMode = ProcessModeEnum.Disabled;
         // To show log messages from your own system do something like this
         //Core.OnLogMessagePushed += WhenLogMessagePushed;
     }
-
+    public override void _UnhandledInput(InputEvent @event)
+    {
+        if(!inputArea.HasFocus()){ return; }
+        if(@event is InputEventKey k){
+            if(k.Keycode == Key.Up){
+                ConsoleCommands.HistoryUp();
+                return;
+            }
+            if(k.Keycode == Key.Down){
+                ConsoleCommands.HistoryDown();
+                return;
+            }
+        }
+    }
     private void WhenLogMessagePushed(object sender, string[] e)
     {
         OutputAddLines(e);
@@ -66,6 +80,7 @@ public partial class GameConsole : Control
     }
     private void OutputAddLines(string[] e)
     {
+        if (e.Length == 1 && e[0].Length == 0) { return; }
         outputArea.Text += String.Join(':', e) + System.Environment.NewLine;
         string[] parts = outputArea.Text.Split(System.Environment.NewLine);
         if (parts.Length > maxLineCount)
@@ -95,6 +110,7 @@ public partial class GameConsole : Control
         {
             instance.Hide();
             instance.inputArea.ReleaseFocus();
+            instance.ProcessMode = ProcessModeEnum.Disabled;
             return false;
         }
         instance.Show();
@@ -104,6 +120,7 @@ public partial class GameConsole : Control
         {
             instance.inputArea.GrabFocus();
         }
+        instance.ProcessMode = ProcessModeEnum.Inherit;
         return true;
     }
 
