@@ -19,29 +19,29 @@ public class Command
     /// Dev note to know where the command was registered from pass in with constructor.
     /// Suggest using class name
     /// </summary>
-    internal string Source => source;
+    public string Source => source;
     /// <summary>
     /// Name of the command and also the command
     /// </summary>
-    internal string Name;
+    public string Name;
     /// <summary>
     /// Description of command 
     /// </summary>
-    internal string Tip;
+    public string Tip;
     /// <summary>
-    /// Text returned when command failed
+    /// Text returned when command failed. If help isnt set it will use the Tip text
     /// </summary>
     internal string Help { get => help.Length == 0 ? Tip : help; set => help = value; }
-    internal string help;
+    private string help;
     
     /// <summary>
     /// Defines the Types the parameters needs to be for the command
     /// </summary>
-    internal Type[] args;
+    public Type[] args;
     /// <summary>
     /// The action the command runs. It returns what should be output in the console
     /// </summary>
-    internal Func<string[], string> act;
+    public Func<string[], string> act;
     private int argCount;
-    internal int ArgCount => argCount;
+    public int ArgCount => argCount;
 }// EOF CLASS
