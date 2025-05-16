@@ -4,7 +4,7 @@ v1.2
 
 Dropin in-game developer console for Godot
 
-[!(https://github.com/MuNgLo/MConsole/blob/main/GitHubMedia/MConsole010001-0535.mp4)]
+[![Example](https://github.com/MuNgLo/MConsole/blob/main/GitHubMedia/MConsole010001-0535.mp4)()]
 
 <video src='https://github.com/MuNgLo/MConsole/blob/main/GitHubMedia/MConsole010001-0535.mp4' with=720>
 
