@@ -3,6 +3,7 @@
 v1.2
 
 Dropin in-game developer console for Godot
+
 [![Demo](https://github.com/MuNgLo/MConsole/blob/main/GitHubMedia/MConsole-01.gif)]
 
 1.2 adding video and use instructions
