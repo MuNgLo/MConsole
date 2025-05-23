@@ -1,8 +1,8 @@
 [gd_scene load_steps=4 format=3 uid="uid://de1od7uc00qsf"]
 
-[ext_resource type="Script" uid="uid://cddvau1c1vj1k" path="res://addons/MConsole/DropinScene/GameConsole.cs" id="1_fd6dq"]
-[ext_resource type="Script" uid="uid://ddt3lbeagqkyl" path="res://addons/MConsole/ConsoleCommands.cs" id="2_5v3cq"]
-[ext_resource type="Script" uid="uid://sre2py33jngr" path="res://addons/MConsole/DropinScene/RegisterDefaultCommands.cs" id="3_eovab"]
+[ext_resource type="Script" uid="uid://60qg6vb3xbyo" path="res://addons/MConsole/DropinScene/GameConsole.cs" id="1_fd6dq"]
+[ext_resource type="Script" uid="uid://qsb1gpbpd888" path="res://addons/MConsole/ConsoleCommands.cs" id="2_5v3cq"]
+[ext_resource type="Script" uid="uid://4hame6jy55ug" path="res://addons/MConsole/DropinScene/RegisterDefaultCommands.cs" id="3_eovab"]
 
 [node name="GameConsole" type="GridContainer" node_paths=PackedStringArray("outputArea", "inputArea", "autocomplete")]
 anchors_preset = 15
@@ -56,8 +56,6 @@ layout_mode = 2
 
 [node name="ConsoleCommands" type="Node" parent="."]
 script = ExtResource("2_5v3cq")
-metadata/_custom_type_script = "uid://ddt3lbeagqkyl"
 
 [node name="RegisterDefaultCommands" type="Node" parent="ConsoleCommands"]
 script = ExtResource("3_eovab")
-metadata/_custom_type_script = "uid://sre2py33jngr"
