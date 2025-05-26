@@ -13,7 +13,7 @@ namespace MConsole;
 public partial class ConsoleCommands : Node
 {
     private static ConsoleCommands ins;
-    public static EventHandler<OnCommandRecievedArguments> OnCommandRecieved;
+    public static EventHandler<OnCommandReceivedArguments> OnCommandReceived;
     private Dictionary<string, Command> commands;
     private int historyLength = 20;
     private int historyIndex = 0;
@@ -85,7 +85,7 @@ public partial class ConsoleCommands : Node
                 {
                     // Run the command and push return string to console
                     GameConsole.AddLine(cmd.act.Invoke(args));
-                    OnCommandRecieved?.Invoke(this, new OnCommandRecievedArguments(args[0], args));
+                    OnCommandReceived?.Invoke(this, new OnCommandReceivedArguments(args[0], args));
                     return;
                 }
 
@@ -94,7 +94,7 @@ public partial class ConsoleCommands : Node
             {
                 // Run the command and push return string to console
                 GameConsole.AddLine(cmd.act.Invoke(args));
-                OnCommandRecieved?.Invoke(this, new OnCommandRecievedArguments(args[0], args));
+                OnCommandReceived?.Invoke(this, new OnCommandReceivedArguments(args[0], args));
                 return;
 
             }

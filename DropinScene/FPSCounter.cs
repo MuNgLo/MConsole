@@ -5,7 +5,7 @@ public partial class FPSCounter : Label
 {
     public override void _Ready()
     {
-        ConsoleCommands.OnCommandRecieved += WhenCommandRecieved;
+        ConsoleCommands.OnCommandReceived += WhenCommandReceived;
         Hide();
         ProcessMode = ProcessModeEnum.Disabled;
     }
@@ -13,7 +13,7 @@ public partial class FPSCounter : Label
     {
         Text = Engine.GetFramesPerSecond().ToString();
     }
-    private void WhenCommandRecieved(object sender, OnCommandRecievedArguments e)
+    private void WhenCommandReceived(object sender, OnCommandReceivedArguments e)
     {
         if (e.command == "showfps")
         {
