@@ -31,8 +31,8 @@ public class Command
     /// <summary>
     /// Text returned when command failed. If help isnt set it will use the Tip text
     /// </summary>
-    internal string Help { get => help.Length == 0 ? Tip : help; set => help = value; }
-    private string help;
+    internal string Help { get => help.Length < 2 ? Tip : help; set => help = value; }
+    private string help = string.Empty;
     
     /// <summary>
     /// Defines the Types the parameters needs to be for the command

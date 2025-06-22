@@ -4,7 +4,7 @@ using Godot;
 
 namespace MConsole;
 /// <summary>
-/// Main class of the consolesystem. Make an instance of this where you think it fits into the project.
+/// Main class of the console system. Make an instance of this where you think it fits into the project.
 /// Then make an instance under it and expose it through a property like
 /// Then use "ConsoleCommands.RegisterCommand" to register in your commands from _Ready or later
 /// allowing this to have been setup first
@@ -33,14 +33,92 @@ public partial class ConsoleCommands : Node
     private void AddDefaultCommands()
     {
         // Source check a command
-        RegisterCommand(new Command("ConsoleSystem Default")
+        RegisterCommand(new Command("ConsoleSystem Default", -1)
         {
             Name = "cmd_source",
             Tip = "Check the source of a registered command",
-            act = s => { return "Registered from: " + GetCommandSource(s[1]); },
+            act = s =>
+            {
+                if (s.Length > 1)
+                {
+                    return GetCommandsMatching(s[1]);
+                }
+                return "Check the source of a registered command";
+            },
+            args = [typeof(string), typeof(string)]
+        });
+        RegisterCommand(new Command("ConsoleSystem Default", 1)
+        {
+            Name = "cmd_search",
+            Tip = "search registered commands for pattern",
+            act = s => { return GetCommandsMatching(s[1]); },
+            args = [typeof(string), typeof(string)]
+        });
+        RegisterCommand(new Command("ConsoleSystem Default", 1)
+        {
+            Name = "search",
+            Tip = "search registered commands for pattern",
+            act = s => { return GetCommandsMatching(s[1]); },
+            args = [typeof(string), typeof(string)]
+        });
+        // Command listing
+        RegisterCommand(new Command("ConsoleSystem Default", -1)
+        {
+            Name = "list",
+            Tip = "list registered commands",
+            act = s =>
+            {
+                if (s.Length > 1)
+                {
+                    return GetCommandsMatching(s[1]);
+                }
+                return GetCommands();
+            },
+            args = [typeof(string), typeof(string)]
+        });
+        RegisterCommand(new Command("ConsoleSystem Default", -1)
+        {
+            Name = "commands",
+            Tip = "list registered commands",
+            act = s =>
+            {
+                if (s.Length > 1)
+                {
+                    return GetCommandsMatching(s[1]);
+                }
+                return GetCommands();
+            },
             args = [typeof(string), typeof(string)]
         });
     }
+
+    private string GetCommandsMatching(string v)
+    {
+        string result = string.Empty;
+        foreach (KeyValuePair<string, Command> keyValuePair in commands)
+        {
+            if (keyValuePair.Key.Contains(v))
+            {
+                result += keyValuePair.Key + ", ";
+            }
+            else if (keyValuePair.Value.Tip.Contains(v))
+            {
+                result += keyValuePair.Key + ", ";
+            }
+        }
+        return result;
+    }
+
+    private string GetCommands()
+    {
+        string result = string.Empty;
+        foreach (string command in commands.Keys)
+        {
+            result += command + ", ";
+        }
+        return result;
+    }
+
 
     private string GetCommandSource(string cmdName)
     {
@@ -74,7 +152,7 @@ public partial class ConsoleCommands : Node
 
             if (args.Length == 1)
             {
-                // Check if the command was given withouth any params when it should. If so give tip
+                // Check if the command was given without any params when it should. If so give tip
                 if (cmd.ArgCount > 0)
                 {
                     GameConsole.AddLine(commands[args[0]].Help);
@@ -90,7 +168,7 @@ public partial class ConsoleCommands : Node
                 }
 
             }
-            else if (args.Length == cmd.ArgCount + 1)
+            else if (args.Length == cmd.ArgCount + 1 || cmd.ArgCount == -1)
             {
                 // Run the command and push return string to console
                 GameConsole.AddLine(cmd.act.Invoke(args));
@@ -154,5 +232,37 @@ public partial class ConsoleCommands : Node
         {
             GameConsole.ClearTip();
         }
+
+        GameConsole.HideAutoCompletes();
+
+        if (GetAutocompletes(e, out string[] matches))
+        {
+            int count = Mathf.Min(matches.Length, 5);
+            for (int i = 0; i < count; i++)
+            {
+                GameConsole.SetAutoComplete(i, matches[i]);
+            }
+        }
     }
+
+    private bool GetAutocompletes(string v, out string[] matches)
+    {
+        matches = new string[0];
+        if (v.Length < 2) { return false; }
+        string result = string.Empty;
+        foreach (KeyValuePair<string, Command> keyValuePair in commands)
+        {
+            if (keyValuePair.Key.Contains(v))
+            {
+                result += keyValuePair.Key + ",";
+            }
+            else if (keyValuePair.Value.Tip.Contains(v))
+            {
+                result += keyValuePair.Key + ",";
+            }
+        }
+        matches = result.Split(',');
+        return result.Contains(",");
+    }
+
 }// EOF CLASS

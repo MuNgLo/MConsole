@@ -50,6 +50,7 @@ theme_override_constants/margin_bottom = 4
 [node name="LineEdit" type="LineEdit" parent="PanelContainer/GridContainer/MarginContainer2"]
 layout_mode = 2
 size_flags_horizontal = 3
+focus_next = NodePath(".")
 
 [node name="GridContainer" type="GridContainer" parent="."]
 layout_mode = 2

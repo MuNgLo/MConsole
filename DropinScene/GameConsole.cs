@@ -12,10 +12,13 @@ public partial class GameConsole : Control
     private static GameConsole instance;
     public static EventHandler<string> OnConsoleInputChanged;
     public static EventHandler<string> OnConsoleInputSubmitted;
+    [Export] private string greetingText = "----------MConsole 1.3----------";
     [Export] private RichTextLabel outputArea;
     [Export] private LineEdit inputArea;
     [Export] private GridContainer autocomplete;
     [Export] private int maxLineCount = 10;
+
+    private NodePath defaultFocusNext;
     /// <summary>
     /// Returns true if console is visible and input area has focus. Use this to limit input while console is open.
     /// </summary>
@@ -29,7 +32,8 @@ public partial class GameConsole : Control
         inputArea.TextChanged += WhenInputChanged;
         inputArea.TextChangeRejected += WhenInputRejected;
         inputArea.KeepEditingOnTextSubmit = true;
-        outputArea.Text = "Console - Welcome to the Despair of the wicked and forgotten. Stay a while. Stay Forever.";
+        defaultFocusNext = instance.inputArea.FocusNext;
+        outputArea.Text = greetingText;
         outputArea.Text += System.Environment.NewLine;
         Hide();
         instance.ProcessMode = ProcessModeEnum.Disabled;
@@ -38,15 +42,31 @@ public partial class GameConsole : Control
     }
     public override void _UnhandledInput(InputEvent @event)
     {
-        if(!inputArea.HasFocus()){ return; }
-        if(@event is InputEventKey k){
-            if(k.Keycode == Key.Up){
+        if (!inputArea.HasFocus()) { return; }
+
+        if (@event is InputEventKey k)
+        {
+            if (k.Keycode == Key.Up)
+            {
                 ConsoleCommands.HistoryUp();
                 return;
             }
-            if(k.Keycode == Key.Down){
+            if (k.Keycode == Key.Down)
+            {
                 ConsoleCommands.HistoryDown();
                 return;
+            }
+        }
+    }
+    public override void _Input(InputEvent @event)
+    {
+        if (!inputArea.HasFocus()) { return; }
+        if (Input.IsActionJustPressed("ui_focus_next"))
+        {
+            if (autocomplete.GetChildCount() > 1 && autocomplete.GetChild<RichTextLabel>(1).Visible)
+            {
+                inputArea.Text = instance.autocomplete.GetChild<RichTextLabel>(1).Text + " ";
+                inputArea.CaretColumn = inputArea.Text.Length;
             }
         }
     }
@@ -124,32 +144,7 @@ public partial class GameConsole : Control
         return true;
     }
 
-    internal static void SetTip(string tip)
-    {
-        GD.Print($"GameConsole::SetTip({tip})");
-        RichTextLabel rtl;
-        if (instance.autocomplete.GetChildCount() < 1)
-        {
-            rtl = new RichTextLabel();
-            instance.autocomplete.AddChild(rtl, true);
-            rtl.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-            rtl.CustomMinimumSize = new Vector2(0, 20);
-            rtl.BbcodeEnabled = true;
-        }
-        else
-        {
-            rtl = instance.autocomplete.GetChild(0) as RichTextLabel;
-        }
-        rtl.Text = tip;
-    }
 
-    internal static void ClearTip()
-    {
-        for (int i = 0; i < instance.autocomplete.GetChildCount(); i++)
-        {
-            instance.autocomplete.GetChild(i).QueueFree();
-        }
-    }
 
     internal static void SetInputText(string v)
     {
@@ -161,4 +156,54 @@ public partial class GameConsole : Control
         instance.inputArea.Text = string.Empty;
     }
 
+    internal static void SetAutoComplete(int i, string v)
+    {
+        while (instance.autocomplete.GetChildCount() < i + 2)
+        {
+            RichTextLabel rtl = new RichTextLabel();
+            instance.autocomplete.AddChild(rtl, true);
+            rtl.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+            rtl.CustomMinimumSize = new Vector2(0, 26);
+            rtl.BbcodeEnabled = true;
+            rtl.Hide();
+        }
+        RichTextLabel ac = instance.autocomplete.GetChild<RichTextLabel>(i + 1);
+        ac.Text = v;
+        ac.Show();
+    }
+    internal static void SetTip(string tip)
+    {
+        //GD.Print($"GameConsole::SetTip({tip})");
+        RichTextLabel rtl;
+        if (instance.autocomplete.GetChildCount() < 1)
+        {
+            rtl = new RichTextLabel();
+            instance.autocomplete.AddChild(rtl, true);
+            rtl.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+            rtl.CustomMinimumSize = new Vector2(0, 26);
+            rtl.BbcodeEnabled = true;
+        }
+        else
+        {
+            rtl = instance.autocomplete.GetChild(0) as RichTextLabel;
+        }
+        rtl.Text = tip;
+        rtl.Show();
+    }
+
+    internal static void ClearTip()
+    {
+        if (instance.autocomplete.GetChildCount() > 0)
+        {
+            instance.autocomplete.GetChild<RichTextLabel>(0).Hide();
+        }
+    }
+
+    internal static void HideAutoCompletes()
+    {
+        for (int i = 1; i < instance.autocomplete.GetChildCount(); i++)
+        {
+            instance.autocomplete.GetChild<RichTextLabel>(i).Hide();
+        }
+    }
 }// EOF CLASS
